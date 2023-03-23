@@ -599,10 +599,24 @@ class AlertsIndividualData(BaseModel):
     def from_points(
         points: List[AnomalyPoint], alert: Alert, kpi: Kpi, date: datetime.date
     ):
+        logger.info(f"Original Points: {points}")
+        points_new = deepcopy(points)
+        # If alert_name contains DOWN, add only drop anomalies
+        if alert.alert_name.strip().endswith("DOWN"):
+            logger.info(f"Alert {alert.alert_name} getting only drop anomalies")
+            points_new = [point for point in points_new if find_percentage_change(point.y, point.yhat) < 0]
+
+        # If alert_name contains UP, add only spike anomalies
+        if alert.alert_name.strip().endswith("UP"):
+            logger.info(f"Alert {alert.alert_name} getting only spike anomalies")
+            points_new = [point for point in points_new if find_percentage_change(point.y, point.yhat) > 0]
+
+        logger.info(f"Filtered Points: {points_new}")
+
         """Constructs data for formatting an individual alert from anomaly points."""
         top_overall_points = deepcopy(
             top_anomalies(
-                [point for point in points if point.is_overall], ALERT_OVERALL_TOP_N
+                [point for point in points_new if point.is_overall], ALERT_OVERALL_TOP_N
             )
         )
         top_subdim_points = deepcopy(
@@ -610,7 +624,7 @@ class AlertsIndividualData(BaseModel):
                 [
                     point
                     for point in iterate_over_all_points(
-                        points, include_subdims=alert.include_subdims
+                        points_new, include_subdims=alert.include_subdims
                     )
                     if point.is_subdim
                 ],
@@ -626,7 +640,7 @@ class AlertsIndividualData(BaseModel):
         )
 
         all_points = list(
-            _format_anomaly_point_for_template(points, kpi, alert, include_subdims=True)
+            _format_anomaly_point_for_template(points_new, kpi, alert, include_subdims=True)
         )
 
         return AlertsIndividualData(

@@ -102,7 +102,7 @@ const Sidebar = () => {
       </div>
       <ul>
         <li className="common-watermark">
-          <span>Version {versionSettingData && versionSettingData.main}</span>
+          <span>Ver {versionSettingData && versionSettingData.main} RC</span>
         </li>
       </ul>
     </div>

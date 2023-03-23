@@ -349,3 +349,5 @@ docs/yarn-error.log*
 ########### Gitpod #########################
 
 dump.rdb
+
+.idea
