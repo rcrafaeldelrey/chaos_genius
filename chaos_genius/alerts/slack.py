@@ -28,6 +28,11 @@ def anomaly_alert_slack(
 
     Returns an empty string if successful or the error as a string if not.
     """
+
+    logger.info(f"all_points len: {len(data.all_points)}")
+    if (data.all_points is not None) and len(data.all_points) == 0:
+        return ""
+
     client = get_webhook_client()
     response = client.send(
         blocks=[
