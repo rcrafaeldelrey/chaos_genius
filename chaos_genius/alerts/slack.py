@@ -31,6 +31,7 @@ def anomaly_alert_slack(
 
     logger.info(f"all_points len: {len(data.all_points)}")
     if (data.all_points is not None) and len(data.all_points) == 0:
+        logger.info("No anomaly data point to alert on slack")
         return ""
 
     client = get_webhook_client()
